@@ -25,10 +25,11 @@ const TextField = ({chatSelected,setChats,chats,setMessageToSend}) => {
           if(!err){
             setText('')
             setChats([...chats,messageToSend])
+            setMessageToSend(messageToSend)
           }
         })
 
-        setMessageToSend(messageToSend)
+        
     }
   return (
     <div className='flex z-10 w-11/12 py-3 justify-between gap-x-6'>

@@ -8,14 +8,15 @@ const SingleConversation = ({chat,chatSelected,setChats}) => {
     const isUser=chat.users[0]==user.id
   
   
-  const  name=chat.isPrivate && !isUser?chatSelected.username:isUser?user.username:chat.sender.username
-
+  const  name=(chat.isPrivate && !isUser)?chatSelected.username:(chat.isPrivate && isUser)?user.username:chat.sender.username
+  
+  
 
   return (
     
         
 
-<div className={`flex gap-3 ${isUser?'flex-row-reverse':'flex-row'}`}>
+<div className={`flex my-2 gap-3 ${isUser?'flex-row-reverse':'flex-row'}`}>
 {
   <span className="flex flex-col justify-center w-12 h-12 rounded-full bg-slate-800 text-white  items-center">
   <p>{name[0].toUpperCase()}</p>

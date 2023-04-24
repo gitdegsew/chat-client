@@ -3,7 +3,7 @@ import { loginFields, signupFields } from "../constants/formFields"
 import FormAction from "./FormAction";
 import Input from "./Input";
 import axios from "axios";
-import { userContext } from '../App';
+
 import { useNavigate } from 'react-router';
 
 const fields=loginFields;
@@ -12,9 +12,11 @@ let fieldsState={};
 fields.forEach(field => fieldsState[field.id]='');
 
 export default function Signup(){
+  const user=JSON.parse(sessionStorage.getItem('currentUser'))
+
   const navigate=useNavigate()
   const [signupState,setSignupState]=useState(fieldsState);
-  const {user,setUser}=useContext(userContext)
+  
 
   const handleChange=(e)=>setSignupState({...signupState,[e.target.id]:e.target.value});
 
@@ -36,7 +38,7 @@ export default function Signup(){
 
       
       sessionStorage.setItem('currentUser',JSON.stringify(response.data))
-      setUser(response.data)
+      
       navigate('/chat')
       
     } catch (error) {
@@ -49,7 +51,7 @@ export default function Signup(){
   }
 
     return(
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6 w-1/2" onSubmit={handleSubmit}>
         <div className="">
         {
                 fields.map(field=>

@@ -4,7 +4,7 @@ import FormAction from "./FormAction";
 import FormExtra from "./FormExtra";
 import Input from "./Input";
 import axios from 'axios'
-import { userContext } from '../App';
+
 import { useNavigate } from 'react-router';
 
 
@@ -14,7 +14,7 @@ fields.forEach(field=>fieldsState[field.id]='');
 
 export default function Login(){
     const [loginState,setLoginState]=useState(fieldsState);
-    const {user,setUser} = useContext(userContext)
+    
     const navigate = useNavigate()
 
     const handleChange=(e)=>{
@@ -35,9 +35,9 @@ export default function Login(){
               password:loginState.password
             })
       
-            console.log(response.data)
+            
             sessionStorage.setItem('currentUser',JSON.stringify(response.data))
-            setUser(response.data)
+            
 
             navigate('/chat')
             
@@ -52,7 +52,7 @@ export default function Login(){
     
 
     return(
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 text-center space-y-6 w-1/2" onSubmit={handleSubmit}>
         <div className="-space-y-px">
             {
                 fields.map(field=>
