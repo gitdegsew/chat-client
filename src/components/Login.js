@@ -39,7 +39,7 @@ export default function Login(){
             sessionStorage.setItem('currentUser',JSON.stringify(response.data))
             
 
-            navigate('/chat')
+            navigate('/videocall')
             
           } catch (error) {
             console.log(error)
