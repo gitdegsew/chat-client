@@ -1,5 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel&family=Fauna+One&family=Roboto+Mono:ital@1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel&family=Fauna+One&family=Roboto&family=Roboto+Mono:ital@1&family=Roboto+Slab:wght@300&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

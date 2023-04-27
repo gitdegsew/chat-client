@@ -8,7 +8,10 @@ module.exports = {
       fontFamily:{
         "cinzel":['Cinzel', 'serif'],
         "foana":['Fauna One','serif'],
-        "Roboto": ['Roboto Mono',' monospace']
+        "RobotoM": ['Roboto Mono',' monospace'],
+        "Roboto": ['Roboto','serif'],
+        "slab": ['Roboto Slab', 'serif'],
+        "marry":['Merriweather', 'serif']
 
       },
       colors:{

@@ -75,7 +75,7 @@ const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelec
           <span className="flex flex-col justify-center w-12 h-12 rounded-full bg-slate-800 text-white  items-center">
               <p>{name[0].toUpperCase()}</p>
           </span>
-          <div className="flex flex-col ">
+          <div className="flex flex-col items-start ">
             <h3 className='font-medium'>{name}</h3>
             {
               isLoading && !error?<p className='text-xs'>message loading...</p>:

@@ -2,10 +2,17 @@ import React, { useState } from 'react'
 import {BsEmojiSmile} from "react-icons/bs"
 import {MdSend} from "react-icons/md"
 import {socket } from "../socket"
+import {ImAttachment} from 'react-icons/im'
 
 const TextField = ({chatSelected,setChats,chats,setMessageToSend}) => {
     const user=JSON.parse(sessionStorage.getItem('currentUser'))
     const [text,setText] =useState('')
+
+
+    const sendFile=(e)=>{
+      console.log('send file')
+
+    }
 
     const handleSend=async()=>{
       console.log('handle send is called')
@@ -18,6 +25,8 @@ const TextField = ({chatSelected,setChats,chats,setMessageToSend}) => {
         users:[user.id,chatSelected],
         isPrivate:chatSelected.username?true:false
       }
+
+     
 
      
       
@@ -33,6 +42,9 @@ const TextField = ({chatSelected,setChats,chats,setMessageToSend}) => {
     }
   return (
     <div className='flex z-10 w-11/12 py-3 justify-between gap-x-6'>
+        <input  type="file" className="hidden"  id="file" onChange={sendFile} />
+          
+                <label htmlFor="file" ><ImAttachment className="h-8 w-8" /></label>
         <div className="flex bg-[#d9dfe1] rounded-md  h-10 w-full  p-4 items-center gap-x-4 " >
             
             <input className=' bg-[#d9dfe1] px-1 w-full focus:outline-none' type="text" value={text} onChange={(e)=>setText(e.target.value)} placeholder="Type text here..." />
