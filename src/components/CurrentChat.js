@@ -20,7 +20,7 @@ const CurrentChat = ({chats,chatSelected,setChats,setMessageToSend}) => {
        <div>
        <hr />
        
-       <TextField chatSelected={chatSelected} chats={chats} setChats={setChats} setMessageToSend={setMessageToSend} />
+       {chatSelected && <TextField chatSelected={chatSelected} chats={chats} setChats={setChats} setMessageToSend={setMessageToSend} />}
        </div>
     </div>
   )

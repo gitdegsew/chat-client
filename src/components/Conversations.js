@@ -1,13 +1,17 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef } from 'react'
 import SingleConversation from './SingleConversation'
 import ReactScrollableFeed from 'react-scrollable-feed'
+import { pageContext } from '../pages/ChatPage'
 
 
 
 const Conversations = ({chats,chatSelected}) => {
   const user=JSON.parse(sessionStorage.getItem('currentUser'))
  
-
+  // console.log('chats')
+  // console.log(chats)
+  
+  
   
   
   return (

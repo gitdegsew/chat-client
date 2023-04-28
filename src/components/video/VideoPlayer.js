@@ -90,8 +90,13 @@ const VideoPlayer = () => {
   
   const handleAnswer=()=>{
     answerCall({from:remoteUser.id,to:user.id})
-    // setCallAccepted(true)
+    setIsBeingCalled(false)
     setIsAnswered(true)
+  }
+  const handleReject=()=>{
+    // answerCall(null)
+    // setCallAccepted(true)
+    setIsAnswered(false)
   }
 
   const handleEndCall=()=>{
@@ -126,6 +131,7 @@ const VideoPlayer = () => {
     socket.on('accept-request',handleReceiveAccept)
     socket.on('end-call',handleEndCall)
     socket.on('receive-call',handleReceiveCall)
+    socket.on('not-accepted',handleReceiveReject)
   
   
     return () => {
@@ -277,7 +283,7 @@ const endCall=()=>{
             <button className="font-Roboto text-[24px] text-white hover:text-[#f5f5dc] bg-[#1dad00] px-3 py-2 rounded-[20px] hover:bg-[#116700]" onClick={handleAnswer}>
               Answer call
             </button>
-            <button className="font-Roboto text-[24px] text-white hover:text-[#f5f5dc] bg-[#cd3740] px-3 py-2 rounded-[20px] hover:bg-[#ad001d]">
+            <button className="font-Roboto text-[24px] text-white hover:text-[#f5f5dc] bg-[#cd3740] px-3 py-2 rounded-[20px] hover:bg-[#ad001d]" onClick={handleReject}>
               Reject call
             </button>
           </>
@@ -302,7 +308,7 @@ const endCall=()=>{
                   ? "bg-[#cd3740] cursor-pointer hover:bg-[#0b3377]"
                   : "bg-[#848484]"
               } px-3 py-2 rounded-[20px] `}
-              disabled={!isCalling || !isBeingCalled}
+              disabled={!isCalling}
               onClick={handleCacel}
             >
               cancel call

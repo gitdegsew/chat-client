@@ -1,16 +1,21 @@
 import React, { useEffect } from 'react'
 import src from '../assets/profile.jpg'
+import {AiFillFile} from "react-icons/ai"
 
 const SingleConversation = ({chat,chatSelected,setChats}) => {
-
-
+  
+console.log("chat")
+console.log(chat)
   const user=JSON.parse(sessionStorage.getItem('currentUser'))
-    const isUser=chat.users[0]==user.id
+  let toCheck = chat.users?chat.users[0]:chat.from
+  const isUser= toCheck===user.id
+  // const name=user.username
   
+  let  name=(chat.isPrivate && !isUser)?chatSelected.username: isUser?user.username:chat.sender?chat.sender:'text'
   
-  const  name=(chat.isPrivate && !isUser)?chatSelected.username:(chat.isPrivate && isUser)?user.username:chat.sender.username
-  
-  
+  if(!name){
+    name='erorr'
+  }
 
   return (
     
@@ -23,7 +28,9 @@ const SingleConversation = ({chat,chatSelected,setChats}) => {
 </span>
 }
 <div className={`'flex flex-col w-auto ${isUser?'bg-[#fbfaf9] rounded-md text-[#30302f]':'bg-[#6a78d1] rounded-md text-white'} p-2 justify-between gap-y-4'`}>
-    <p>{chat.message}</p>
+     {chat.messageType==='image'?<img className='w-[18vw] ' src={chat.message} />: chat.messageType==="non-text"?<p>
+      <AiFillFile/> {chat.message}
+     </p>:chat.messageType==="image-blob"?<img className='w-[18vw]  ' src={chat.message} />:  <p>{chat.message}</p>}
     <p className='text-xs'>12:20</p>
 
 </div>
