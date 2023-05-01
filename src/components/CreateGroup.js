@@ -18,9 +18,10 @@ const CreateGroup = ({setIsHiddden,groups,setGroups}) => {
 
     useEffect(()=>{
         const lis=() =>{
-            document.getElementById('createGroup').style.display='none'
+            setIsHiddden(true)
            
         }
+        console.log('clic')
         document.addEventListener('click',lis)
     
         return ()=>{
