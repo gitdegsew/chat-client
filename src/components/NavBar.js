@@ -1,14 +1,22 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import src from '../assets/profile.jpg'
 import {FiSearch} from "react-icons/fi"
 import {MdCall,MdVideoCall} from "react-icons/md"
 import {HiOutlineDotsHorizontal} from 'react-icons/hi'
 import { useNavigate } from 'react-router'
+import { appContext } from '../App'
 
 const NavBar = ({chatSelected}) => {
   const navigate=useNavigate()
+
+  const {onlineUsers}=useContext(appContext)
+  // console.log('from chat')
+  // console.log(onlineUsers)
+  
+  let isOnline
   let name
   if(chatSelected){
+    isOnline=onlineUsers.includes(chatSelected._id)
     name=chatSelected.username?chatSelected.username:chatSelected.groupName
   }
 
@@ -37,7 +45,7 @@ const NavBar = ({chatSelected}) => {
             <div className='flex justify-center gap-x-4 pr-6'>
             <FiSearch/>
             <MdCall/>
-            <MdVideoCall className={`${(chatSelected && chatSelected.username)?"cursor-pointer":"text-gray-400"}`} onClick={(chatSelected && chatSelected.username)?handleClick:()=>{}} />
+            <MdVideoCall className={`${(chatSelected && chatSelected.username && isOnline)?"cursor-pointer":"text-gray-400"}`} onClick={(chatSelected && chatSelected.username && isOnline)?handleClick:()=>{}} />
             <HiOutlineDotsHorizontal/>
 
 

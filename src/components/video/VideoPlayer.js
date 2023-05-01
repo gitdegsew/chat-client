@@ -21,6 +21,7 @@ const VideoPlayer = () => {
   const [isVidEnabled, setIsVidEnabled] = useState(true);
   const [isMicEnabled, setIsMicEnabled] = useState(true);
   const [caller,setCaller] = useState(null)
+  const [timeoutId,setTimeoutId] = useState(null)
 
 
 
@@ -42,6 +43,8 @@ const VideoPlayer = () => {
 
   
   const  {
+    isBeingRequested,
+    setIsBeingRequested,
     isBeingCalled,
     requestRejected,
     requestAccepted,
@@ -66,8 +69,12 @@ const VideoPlayer = () => {
   }
 
 
-  const onAnswer=() =>{
+  const onAcceptRequest=() =>{
     socket.emit('accept-request',{from:user.id,to:caller.id})
+    setIsBeingCalled(true)
+    setRequestAccepted(true)
+    setIsBeingRequested(false)
+    clearTimeout(timeoutId)
     navigate('/videoCall',
    { state:{
       remoteUser:caller
@@ -75,11 +82,12 @@ const VideoPlayer = () => {
     )
   
    }
-   const onReject=() =>{
+   const onRejectRequest=() =>{
     // socket.emit()
     socket.emit('reject-request',{from:user.id,to:caller.id})
     setCaller(null)
-    setIsBeingCalled(false)
+    clearTimeout(timeoutId)
+    setIsBeingRequested(false)
   
    }
 
@@ -88,15 +96,15 @@ const VideoPlayer = () => {
 
 
   
-  const handleAnswer=()=>{
+  const handleAnswerCall=()=>{
     answerCall({from:remoteUser.id,to:user.id})
     setIsBeingCalled(false)
     setIsAnswered(true)
   }
-  const handleReject=()=>{
-    // answerCall(null)
-    // setCallAccepted(true)
-    setIsAnswered(false)
+  const handleRejectCall=()=>{
+    socket.emit('reject-call',{from:user.id,to:remoteUser.id})
+    setIsBeingCalled(false)
+    // setIsAnswered(false)
   }
 
   const handleEndCall=()=>{
@@ -109,19 +117,71 @@ const VideoPlayer = () => {
   }
 
   const handleReceiveCall=({from,to})=>{
+    console.log('call received from vp ')
     
-    if(!isBeingCalled && !isCalling ){
-      if(to._id===user.id){
       
-        setCaller(from)
-        setIsBeingCalled(true)
-      }
-    }
+      setCaller(from)
+      setIsBeingRequested(true)
+      // console.log(isBeingRequested)
+      // console.log(caller)
+      
+    const ti= setTimeout(()=>{
+      
+      
+       console.log("time out executed from vp")
+        socket.emit('reject-request', {from:to._id,to:from.id})
+        setIsBeingRequested(false)
+      
+    },11000)
+    setTimeoutId(ti)
+
+   console.log('timeout id from vp: ',ti)
       
       
   }
 
+
+  const handleCancelCall=({from,to})=>{
+    console.log('call cnacelled ')
+    
+      notify("call cnacelled")
+      setCaller(null)
+      clearTimeout(timeoutId)
+      
+      setIsBeingRequested(true)
+      setIsBeingCalled(false)
+ 
+      
+  }
+  const handleReceiveRejectCall=({from,to})=>{
+    console.log('call rejecte received ')
+    
+      notify("call rejected")
+      setIsCalling(false)
+      
+   
+  }
+
   const notify = (text) => toast.error(text);
+
+  useEffect(()=>{
+
+
+    socket.on('receive-call',handleReceiveCall)
+    socket.on('cancel-call',handleCancelCall)
+    
+    
+  
+  
+    return () => {
+      console.log("cleared video player timeoutid")
+      socket.removeAllListeners("receive-call");
+      socket.removeAllListeners('cancel-call');
+     
+      
+    };
+  },[timeoutId])
+
 
   useEffect(()=>{
 
@@ -130,18 +190,20 @@ const VideoPlayer = () => {
     socket.on('reject-request',handleReceiveReject)
     socket.on('accept-request',handleReceiveAccept)
     socket.on('end-call',handleEndCall)
-    socket.on('receive-call',handleReceiveCall)
-    socket.on('not-accepted',handleReceiveReject)
+    socket.on('reject-call',handleReceiveRejectCall)
+    
+    
   
   
     return () => {
       
-      
+      console.log('video player cleared')
       socket.removeAllListeners("accept-request");
       socket.removeAllListeners("reject-request");
+      socket.removeAllListeners("reject-call");
       socket.removeAllListeners("end-call");
-      socket.removeAllListeners("receive-call");
-      // socket.removeAllListeners("toggle-cam");
+      
+      
       
     };
   },[])
@@ -168,6 +230,7 @@ const endCall=()=>{
       setIsCalling(true)
   }
   const handleCacel = () => {
+    socket.emit("cancel-call",{from:user,to:userToCall})
     setIsCalling(false);
   };
 
@@ -214,7 +277,7 @@ const endCall=()=>{
     <div
       className={`${"flex flex-col justify-between items-center w-full  h-full p-8 pb-32 bg-[#dafdea] relative gap-y-10"}`}
     >
-      {isBeingCalled&& caller&& caller.id!==remoteUser._id &&  <MyNotificaiton caller={caller} onAnswer={onAnswer} onReject={onReject}   />}
+      {isBeingRequested&& caller&&   <MyNotificaiton caller={caller} onAcceptRequest={onAcceptRequest} onRejectRequest={onRejectRequest}   />}
       <ToastContainer />
       {/* <AppBar/> */}
       <div
@@ -280,10 +343,10 @@ const endCall=()=>{
       <div className="flex justify-between items-center gap-x-10">
         {isBeingCalled && !isAnswered && (
           <>
-            <button className="font-Roboto text-[24px] text-white hover:text-[#f5f5dc] bg-[#1dad00] px-3 py-2 rounded-[20px] hover:bg-[#116700]" onClick={handleAnswer}>
+            <button className="font-Roboto text-[24px] text-white hover:text-[#f5f5dc] bg-[#1dad00] px-3 py-2 rounded-[20px] hover:bg-[#116700]" onClick={handleAnswerCall}>
               Answer call
             </button>
-            <button className="font-Roboto text-[24px] text-white hover:text-[#f5f5dc] bg-[#cd3740] px-3 py-2 rounded-[20px] hover:bg-[#ad001d]" onClick={handleReject}>
+            <button className="font-Roboto text-[24px] text-white hover:text-[#f5f5dc] bg-[#cd3740] px-3 py-2 rounded-[20px] hover:bg-[#ad001d]" onClick={handleRejectCall}>
               Reject call
             </button>
           </>

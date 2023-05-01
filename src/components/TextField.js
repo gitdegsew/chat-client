@@ -6,9 +6,9 @@ import { ImAttachment } from "react-icons/im";
 import { postMessage,postImage } from "../utils/api";
 import Picker from '@emoji-mart/react'
 import data from '@emoji-mart/data'
+import { baseUrl } from "../utils/api";
 
 
-const baseUrl = "http://localhost:3001"
 
 const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
   const user = JSON.parse(sessionStorage.getItem("currentUser"));
@@ -78,6 +78,7 @@ const selectedEmoji = (e)=>{
           sender:user.username,
           messageType:'non-text',
           isPrivate: chatSelected.username ? true : false,
+          createdAt:new Date()
       }
 
       setMessageToSend(
@@ -108,6 +109,7 @@ const selectedEmoji = (e)=>{
             message: blobdata,
             messageType:'image',
             isPrivate: chatSelected.username ? true : false,
+            createdAt:new Date()
 
 
         }
@@ -126,6 +128,7 @@ const selectedEmoji = (e)=>{
             formdata.append("to", chatSelected._id)
             formdata.append("messageType", "image-blob")
             formdata.append("isPrivate", chatSelected.username ? true : false)
+            formdata.append("createdAt", new Date())
             
             console.log('from text field', formdata)
         const token=user.accessToken
@@ -169,6 +172,7 @@ const selectedEmoji = (e)=>{
             max_buffer_size: buffer.length,
             buffer_size: 1024,
             isPrivate: chatSelected.username ? true : false,
+            createdAt:new Date()
           },
           buffer
         );
@@ -192,6 +196,7 @@ const selectedEmoji = (e)=>{
       messageType:'text',
       isPrivate: chatSelected.username ? true : false,
       sender:user.username,
+      createdAt:new Date()
     };
     setText("");
     setChats([...chats, messageToSend]);

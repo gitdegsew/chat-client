@@ -1,5 +1,6 @@
 import axios from "axios"
 
+// const baseUrl = "http://192.168.0.163:3001"
 const baseUrl = "http://localhost:3001"
 
 const getUsers =async (token,id)=>{
@@ -19,6 +20,21 @@ const getUsers =async (token,id)=>{
 const getGroups = async (token) => {
     try {
         const response = await axios.get(`${baseUrl}/groups`,{
+            headers:{
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        return response.data
+    } catch (error) {
+        throw new Error(error.message)
+    }
+
+}
+const postGroup = async (token,groupName,userId) => {
+    try {
+        const response = await axios.post(`${baseUrl}/groups`,{
+            groupName,userId
+        },{
             headers:{
                 'Authorization': 'Bearer ' + token
             }
@@ -77,5 +93,5 @@ const postImage = async (token,formdata) => {
 
 }
 
-export {getGroups,getUsers,getMessages,postMessage,postImage}
+export {getGroups,getUsers,getMessages,postMessage,postImage,baseUrl,postGroup}
 

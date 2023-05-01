@@ -131,10 +131,11 @@ const ContextProvider = () => {
     // });
 
     
-
+    socket.connect()
+    socket.emit('login',user)
 
     return () => {
-      console.log("cleared")
+      console.log("context cleared")
       socket.removeAllListeners("user-logdedIn");
       socket.removeAllListeners("receive-offer");
       socket.removeAllListeners("receive-answer");

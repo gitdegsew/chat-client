@@ -7,10 +7,13 @@ import { getUsers,getGroups } from '../utils/api';
 import { appContext, userContext } from '../App'
 import MyNotificaiton from '../components/video/notification'
 import { useNavigate } from 'react-router'
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const pageContext= createContext()
 const ChatPage = () => {
+
+  
   const user=JSON.parse(sessionStorage.getItem('currentUser'))
   const [users,setUsers] = useState(null)
   const [groups,setGroups] = useState(null)
@@ -22,10 +25,13 @@ const ChatPage = () => {
   const [caller,setCaller] = useState(null)
   const [receivedMessage,setReceivedMessage] = useState(null)
   const [fileshare,setFileshare] = useState({})
-
-  const myChats=useRef([...chats])
+  const [timeoutId,setTimeoutId] = useState(null)
+  const [updatedItem,setUpdatedItem]=useState(null)
+  
 
   const  {
+    isBeingRequested,
+    setIsBeingRequested,
     isBeingCalled,
     requestRejected,
     requestAccepted,
@@ -46,7 +52,7 @@ const ChatPage = () => {
   const [error,setError]=useState(null)
 
 
-
+  const notify = (text) => toast.error(text);
   const download= (data, file)=>{
         
     let a=document.createElement('a')
@@ -68,7 +74,7 @@ const handleMsgReceived=(data) =>{
  
 }
 const handleMsgReceivedOne=(data) =>{
-    console.log('from handle msg received')
+    
     
   console.log(' another event received from page')
   
@@ -112,7 +118,7 @@ useEffect(()=>{
             const to= fileshare.metadata.to
             const isPrivate=fileshare.metadata.isPrivate
             const dataTosave={
-              from,to,message,messageType:'image',isPrivate,sender
+              from,to,message,messageType:'image',isPrivate,sender,createdAt:fileshare.metadata.createdAt
             }
 
             setReceivedMessage(dataTosave)
@@ -130,8 +136,9 @@ useEffect(()=>{
 
           const sender=fileshare.metadata.sender
           const isPrivate=fileshare.metadata.isPrivate
+          
           const dataTosave={
-            from,to,message:fileshare.metadata.filename,messageType:'non-text',isPrivate,sender
+            from,to,message:fileshare.metadata.filename,messageType:'non-text',isPrivate,sender,createdAt:fileshare.metadata.createdAt
           }
 
           setChats([...chats,dataTosave])
@@ -206,8 +213,14 @@ if(chatSelected){
 
   
 
- const onAnswer=() =>{
+ const onAcceptRequest=() =>{
+  
   socket.emit('accept-request',{from:user.id,to:caller.id})
+  setIsBeingCalled(true)
+  setRequestAccepted(true)
+  setIsBeingRequested(false)
+  console.log('accept-request: ',timeoutId)
+  clearTimeout(timeoutId)
   navigate('/videoCall',
  { state:{
     remoteUser:caller
@@ -215,11 +228,13 @@ if(chatSelected){
   )
 
  }
- const onReject=() =>{
+ const onRejectRequest=() =>{
   // socket.emit()
   socket.emit('reject-request',{from:user.id,to:caller.id})
   setCaller(null)
-  setIsBeingCalled(false)
+  clearTimeout(timeoutId)
+  setRequestRejected(true)
+  setIsBeingRequested(false)
 
  }
 
@@ -228,20 +243,36 @@ if(chatSelected){
     
       
       setCaller(from)
-      setIsBeingCalled(true)
+      setIsBeingRequested(true)
 
       
-    setTimeout(()=>{
+    const ti= setTimeout(()=>{
       
-      socket.emit('reject-request', {from:to,to:from})
-      setIsBeingCalled(false)
-      setCaller(null)
+      
+       console.log("time out executed")
+        socket.emit('reject-request', {from:to._id,to:from.id})
+        setIsBeingRequested(false)
+      
     },11000)
+    setTimeoutId(ti)
 
-   
+   console.log('timeout id: ',ti)
       
       
   }
+  const handleCancelCall=({from,to})=>{
+      console.log('call cnacelled ')
+      
+        notify("call cnacelled")
+        setCaller(null)
+        clearTimeout(timeoutId)
+        
+        setIsBeingRequested(true)
+        setIsBeingCalled(false)
+   
+        
+    }
+   
 
   
 
@@ -257,16 +288,18 @@ useEffect(()=>{
 
 
   socket.on('receive-call',handleReceiveCall)
+  socket.on('cancel-call',handleCancelCall)
   
 
 
   return () => {
     console.log("cleared chat page")
     socket.removeAllListeners("receive-call");
+    socket.removeAllListeners('cancel-call');
    
     
   };
-},[])
+},[timeoutId])
 
   useEffect(() =>{
     
@@ -303,7 +336,11 @@ useEffect(()=>{
   return (
     <pageContext.Provider value ={
         {
-          receivedMessage
+          receivedMessage,
+          updatedItem,
+          setUpdatedItem,
+          setGroups,
+          groups
         }
     }>
         <div className='flex gap-x-2 justify-start  left-0 top-0 w-full fixed ' >
@@ -313,8 +350,9 @@ useEffect(()=>{
   !isLoading && error?<p>{error}</p>:
   (
     <>
-    {isBeingCalled&& caller&& <MyNotificaiton caller={caller} onAnswer={onAnswer} onReject={onReject}   />}
-    <SideBar tabSelected={tabSelected} setTabSelected={setTabSelected} /><Chats messageToSend= {messageToSend} users={users} groups={groups} tabSelected={tabSelected} setChatSelected={setChatSelected} setChats={setChats} chatSelected={chatSelected} /><CurrentChat setMessageToSend={setMessageToSend} chatSelected={chatSelected} chats={chats} setChats={setChats} /></>
+    {isBeingRequested&& caller&& <MyNotificaiton caller={caller} onAcceptRequest={onAcceptRequest} onRejectRequest={onRejectRequest}   />}
+    <ToastContainer />
+    <SideBar tabSelected={tabSelected} setTabSelected={setTabSelected} /><Chats setGroups={setGroups} receivedMessage={receivedMessage} messageToSend= {messageToSend} users={users} groups={groups} tabSelected={tabSelected} setChatSelected={setChatSelected} setChats={setChats} chatSelected={chatSelected} /><CurrentChat setMessageToSend={setMessageToSend} chatSelected={chatSelected} chats={chats} setChats={setChats} /></>
   )
 
 }

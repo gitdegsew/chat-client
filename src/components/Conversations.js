@@ -8,8 +8,7 @@ import { pageContext } from '../pages/ChatPage'
 const Conversations = ({chats,chatSelected}) => {
   const user=JSON.parse(sessionStorage.getItem('currentUser'))
  
-  // console.log('chats')
-  // console.log(chats)
+  
   
   
   

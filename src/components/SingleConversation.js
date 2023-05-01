@@ -4,8 +4,14 @@ import {AiFillFile} from "react-icons/ai"
 
 const SingleConversation = ({chat,chatSelected,setChats}) => {
   
-console.log("chat")
-console.log(chat)
+ 
+  const date=new Date(chat.createdAt)
+  const hour=date.getHours()%12
+  const htd=hour<10?'0'+hour:hour
+  const mtd=date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes()
+  const identify= date.getHours()<=12?"AM":"PM"
+  const now= new Date()
+  const diff= (date.getTime()-now.getTime())<1000 ?'just now':"not now"
   const user=JSON.parse(sessionStorage.getItem('currentUser'))
   let toCheck = chat.users?chat.users[0]:chat.from
   const isUser= toCheck===user.id
@@ -16,7 +22,7 @@ console.log(chat)
   if(!name){
     name='erorr'
   }
-
+   
   return (
     
         
@@ -27,12 +33,12 @@ console.log(chat)
   <p>{name[0].toUpperCase()}</p>
 </span>
 }
-<div className={`'flex flex-col w-auto ${isUser?'bg-[#fbfaf9] rounded-md text-[#30302f]':'bg-[#6a78d1] rounded-md text-white'} p-2 justify-between gap-y-4'`}>
+<div className={`'flex flex-col max-w-[350px] ${isUser?'bg-[#fbfaf9] rounded-md text-[#30302f]':'bg-[#6a78d1] rounded-md text-white'} p-2 justify-between gap-y-4'`}>
      {chat.messageType==='image'?<img className='w-[18vw] ' src={chat.message} />: chat.messageType==="non-text"?<p>
       <AiFillFile/> {chat.message}
      </p>:chat.messageType==="image-blob"?<img className='w-[18vw]  ' src={chat.message} />:  <p>{chat.message}</p>}
-    <p className='text-xs'>12:20</p>
-
+    <p className='text-xs'>{`${htd}:${mtd} ${identify}` }</p>
+    {/* `${htd}:${mtd} ${identify}` */}
 </div>
 </div>
 
