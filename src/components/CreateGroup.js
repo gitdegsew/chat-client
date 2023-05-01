@@ -43,7 +43,7 @@ const CreateGroup = ({setIsHiddden,groups,setGroups}) => {
           if(groups.map(group =>group.groupName).includes(e.target.value)){
             setError(new Error('group name used'))
           }
-          else if(!onlyLettersAndSpaces(e.target.value)){
+          else if(!onlyLettersAndSpaces(e.target.value) || e.target.value.length<2){
             setError(new Error("Invalid group name"))
 
           }
