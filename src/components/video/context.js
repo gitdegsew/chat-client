@@ -3,9 +3,12 @@ import { socket } from "../../socket";
 import VideoPlayer from "./VideoPlayer";
 import { FaChrome } from "react-icons/fa";
 import ReactPlayer from "react-player";
-import Controls from "./Controls";
+
 import { useLocation } from "react-router";
 import { appContext } from "../../App";
+import { useBeforeUnload } from "react-router-dom";
+import { stopBothVideoAndAudio } from "../../utils/stream";
+
 
 const SocketContext = createContext();
 
@@ -43,19 +46,21 @@ const ContextProvider = () => {
   }=useContext(appContext)
 
   const location= useLocation()
-  const {remoteUser}=location.state
+  const {isVideo, remoteUser}=location.state
   
 
   const myVideo = useRef();
   const userVideo = useRef();
   const rs = useRef(null);
+  const rls=useRef(null)
   const peerConnection = useRef();
   
   const askForDevicePermission =useCallback(()=>{
     navigator.mediaDevices
-    .getUserMedia({ video: true, audio: true })
+    .getUserMedia({ video: isVideo, audio: true })
     .then((currentStream) => {
       setLocalStream(currentStream);
+      rls.current=currentStream
         currentStream.getTracks().forEach((track) => {
       peerConnection.current.addTrack(track, currentStream);
       
@@ -64,6 +69,17 @@ const ContextProvider = () => {
       
     });
   },[])
+
+
+
+  // useBeforeUnload(
+  //   ()=>{
+  //     if(localStream){
+  //       stopBothVideoAndAudio(localStream)
+  //     }
+  //   }
+   
+  // )
   
 
   useEffect(() => {
@@ -76,11 +92,12 @@ const ContextProvider = () => {
     // socket.connect();
     // socket.emit("login", user);
     
-    peerConnection.current.current=pc
+    
     peerConnection.current.ontrack = (event) => {
       console.log('track added')
       setRemoteStream(event.streams[0])
       userVideo.current.srcObject=event.streams[0]
+      rs.current=event.streams[0]
       // console.log("uservideo", userVideo.current.srcObject)
       // event.streams[0].getTracks().forEach((track) => {
       //   if (remoteStream) {
@@ -116,26 +133,23 @@ const ContextProvider = () => {
         }
       }
     });
-    // socket.on("user-loggedIn", ({ user }) => {
-
-    //   console.log("user has logged in  " + user.id);
-    //   setRemoteUser(user);
-    //   // setUserLoggedIn(true)
-    //   // callUser(userId)
-    // });
-
-    // socket.on("logout", (userId) => {
-    //   setRemoteUser(null);
-    //   console.log("user logged out " + userId);
-      
-    // });
+    
 
     
     socket.connect()
     socket.emit('login',user)
 
     return () => {
-      console.log("context cleared")
+      console.log("context cleared context cleared",rls.current)
+      // peerConnection.current.close()
+      if(rls.current){
+        stopBothVideoAndAudio(rls.current)
+        
+      }
+      if(rs.current){
+        stopBothVideoAndAudio(rs.current)
+        
+      }
       socket.removeAllListeners("user-logdedIn");
       socket.removeAllListeners("receive-offer");
       socket.removeAllListeners("receive-answer");
@@ -214,6 +228,7 @@ const ContextProvider = () => {
         
       }
       setIsAnswered(true)
+      setIsCalling(false)
       console.log(peerConnection.current.iceConnectionState)
     
   };
@@ -248,26 +263,7 @@ const ContextProvider = () => {
       }
     };
     
-    // setRemoteStream(new MediaStream());
-    // userVideo.current.srcObject = remoteStream;
-
-    // if (localStream) {
-    //   localStream.getTracks().forEach((track) => {
-    //     peerConnection.current.addTrack(track, localStream);
-    //   });
-    // }
-
-    // peerConnection.current.ontrack = (event) => {
-    //   console.log('track added')
-    //   userVideo.current.srcObject=localStream
-    //   console.log("uservideo", userVideo.current.srcObject)
-    //   // event.streams[0].getTracks().forEach((track) => {
-    //   //   if (remoteStream) {
-    //   //     console.log('track added')
-    //   //     remoteStream.addTrack(track);
-    //   //   }
-    //   // });
-    // };
+   
 
     peerConnection.current.onicecandidate = (event) => {
       if (event.candidate) {
@@ -300,7 +296,11 @@ const ContextProvider = () => {
         answerCall,
         remoteUser,
         isAnswered,
-        setIsAnswered
+        setIsAnswered,
+        rs,
+        rls,
+        peerConnection,
+        isVideo
       }}
       
     >

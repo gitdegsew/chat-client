@@ -9,9 +9,18 @@ import {CgProfile} from "react-icons/cg"
 import {BsGlobe2,BsChatSquareTextFill} from "react-icons/bs"
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
+import { useNavigate } from 'react-router';
+import { socket } from '../socket';
 
 const SideBar = ({setTabSelected,tabSelected}) => {
   const user = JSON.parse(sessionStorage.getItem('currentUser'))
+  const navigate=useNavigate()
+  const handleLogOut=()=>{
+
+      navigate('/')
+      socket.emit('logout',user.id)
+      sessionStorage.removeItem('currentUser')
+  }
   return (
     <div className="flex flex-col justify-around w-20 items-center h-full ">
         <div>
@@ -39,7 +48,7 @@ const SideBar = ({setTabSelected,tabSelected}) => {
         </div>
         <div className='flex flex-col justify-between gap-y-8' >
         <BsGlobe2 className='w-8 h-8' />
-        <IoMdLogOut id="app-title" className='w-8 h-8 hover:cursor-pointer'   />
+        <IoMdLogOut onClick={handleLogOut} id="app-title" className='w-8 h-8 hover:cursor-pointer'   />
         </div>
         <ReactTooltip
         anchorId="app-title"

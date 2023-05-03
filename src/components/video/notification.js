@@ -1,9 +1,10 @@
 import React from 'react'
 import ReactLoading from "react-loading";
-const MyNotificaiton = ({caller,onAcceptRequest,onRejectRequest}) => {
+const MyNotificaiton = ({caller,onAcceptRequest,onRejectRequest,isVideo}) => {
+
   return (
     <div className="flex flex-col justify-around items-center rounded-2xl w-auto    p-5 h-32 bg-[#044525] absolute top-2 right-4 z-40">
-        <p className='font-RobotoM text-[#bada55] text-2xl pt-5' >{caller?caller.username:'somebody'}  asking video call...</p>
+        <p className='font-RobotoM text-[#bada55] text-2xl pt-5' >{caller?caller.username:'somebody'}  asking {isVideo?"video":"audio"} call...</p>
         <ReactLoading
             className=' -mt-5 mb-5'
             type="bubbles"

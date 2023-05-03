@@ -61,6 +61,8 @@ const CreateGroup = ({setIsHiddden,groups,setGroups}) => {
         setGroup(result)
         setIsHiddden(true)
         setGroups([...groups,result])
+        socket.emit('groupCreated',groupName)
+        
         
       } catch (error) {
         setIsLoading(false)

@@ -24,7 +24,12 @@ const Chats = ({
   const [mcount, setmCount] = useState(0);
   const [isUpdated,setIsUpdated] = useState({})
   const [isHiddden,setIsHiddden] =useState(true)
-  // const map=new Map(allChats.map(chat=>[chat,undefined]))
+  const [isSearching,setIsSearching] = useState(false)
+  const [searchedItems,setSearchedItems] = useState([])
+  const [searchItem, setSearchItem] = useState("");
+
+
+
   const lastMessages = React.useRef(new Map());
   const newChats = React.useRef([]);
 
@@ -32,9 +37,8 @@ const Chats = ({
   //   receivedMessage,
 
   // }=useContext(pageContext)
-  const [searchItem, setSearchItem] = useState("");
-  console.log("what about chats");
-  console.log(lastMessages.current);
+  
+  
 
   // let newChats
 
@@ -46,7 +50,7 @@ const Chats = ({
 
   const handleUpdate =()=>{
     if (mcount >= allChats.length) {
-      console.log("guble atifre");
+      
       const nm = new Map([...lastMessages.current].filter((e) => e[1]));
       // console.log(nm)
       const unsortedK = Array.from(nm.keys());
@@ -57,10 +61,7 @@ const Chats = ({
         .filter((item) => item);
   
       const values = Array.from(nm.values());
-      // console.log('values')
-      // console.log(values)
-      // console.log('chats')
-      // console.log(unsorted)
+      
       const newUnsorted = unsorted.map((item, index) => {
         //
         const createdAt = values[index].createdAt;
@@ -71,8 +72,7 @@ const Chats = ({
         };
       });
   
-      // console.log('unsorted')
-      // console.log(newUnsorted)
+     
       const sorted = newUnsorted
         .sort(
           (chat1, chat2) =>
@@ -97,8 +97,7 @@ const Chats = ({
   
       newChats.current = [...sorted, ...undefinedChats];
   
-      console.log("final chats");
-      console.log(newChats.current);
+    
     }
   }
 
@@ -108,17 +107,14 @@ const Chats = ({
 
 
   useEffect(() => {
-    console.log("howdy howdy howdy howdy howdy howdy howdy howdy howdy howdy");
+    
     if (receivedMessage) {
       const toCheck = receivedMessage.isPrivate
         ? receivedMessage.from
         : receivedMessage.to;
-      console.log("to check");
-      console.log(toCheck);
-      console.log(newChats.current);
+    
       const item = newChats.current.find((item) => toCheck === item._id);
-      console.log("selected item");
-      console.log(item);
+      
       newChats.current = newChats.current.filter(
         (chat) => chat._id !== item._id
       );
@@ -145,9 +141,68 @@ const Chats = ({
         (chat) => chat._id !== item._id
       );
       lastMessages.current.set(item._id, messageToSend);
-      // setUpdatedItem({item,messageToSend})
     }
   }, [messageToSend]);
+
+  
+
+const handleOnFocus=()=>{
+  // console.log(lastMessages.current)
+  // console.log(Array.from(lastMessages.current.values()))
+ if(!searchItem){
+  const chatsWithMessage = newChats.current.map(chat =>{
+    // console.log("each last message")
+    
+    const message=lastMessages.current.get(chat._id)
+    // console.log(chat._id)
+    // console.log(message)
+    if(message){
+      return {...chat, messages:[message]}
+    }
+    else{
+      return {...chat,messages:[]}
+    }
+   
+  }
+    
+  )
+  setSearchedItems(chatsWithMessage)
+ }
+}
+
+const handleSearch= (e)=>{
+    setSearchItem(e.target.value)
+    
+    if(e.target.value){
+      setIsSearching(true)
+    }
+    else {
+      setIsSearching(false)
+    }
+    console.log("mapping search item")
+    // console.log(lastMessages.current)
+    console.log(searchedItems)
+
+    
+    const filteredItems =newChats.current.filter(item=>{
+      const chatName=item.username?item.username:item.groupName
+      if(chatName.includes(e.target.value)) return true
+      return false
+    })
+
+    setSearchedItems(filteredItems)
+    setIsUpdated({...isUpdated})
+    console.log("filetered items")
+    console.log(filteredItems)
+
+  }
+
+  useEffect(()=>{
+    console.log("10th times")
+    return ()=>{
+      console.log('checking for updates ...bisre')
+    }
+  },[])
 
   
   
@@ -177,15 +232,33 @@ const Chats = ({
           className="w-full bg-[#f5fcff] px-1 focus:outline-none"
           type="text"
           value={searchItem}
-          onChange={(e) => setSearchItem(e.target.value)}
+          onChange={(e) => handleSearch(e)}
           placeholder="Search user"
+          onFocus={(e) => handleOnFocus()}
         />
       </div>
       
 
       <h2 className="font-medium">Recent</h2>
       <div className="flex flex-col gap-y-4 overflow-clip hover:overflow-y-auto  scrollbar-track-slate-300  scrollbar-thin scrollbar-thumb-[#61605e]">
-        {mcount < allChats.length
+        {isSearching?searchedItems.map((item, index) => (
+              <Chat
+                setmCount={setmCount}
+                receivedMessage={receivedMessage}
+                counts={counts}
+                lastMessages={lastMessages}
+                chatSelected={chatSelected}
+                key={item._id}
+                messageToSend={messageToSend}
+                item={item}
+                setChatSelected={setChatSelected}
+                setChats={setChats}
+                tabSelected={tabSelected}
+                searchItem={searchItem}
+                
+              />
+            )):
+         !isSearching && mcount < allChats.length
           ? allChats.map((item, index) => (
               <Chat
                 setmCount={setmCount}
@@ -199,9 +272,11 @@ const Chats = ({
                 setChatSelected={setChatSelected}
                 setChats={setChats}
                 tabSelected={tabSelected}
+                searchItem={searchItem}
+                
               />
             ))
-          : newChats.current.map((item, index) => (
+          :!isSearching && newChats.current.map((item, index) => (
               <Chat
                 setmCount={setmCount}
                 counts={counts}
@@ -213,6 +288,8 @@ const Chats = ({
                 setChatSelected={setChatSelected}
                 setChats={setChats}
                 tabSelected={tabSelected}
+                searchItem={searchItem}
+                
               />
             ))}
       </div>

@@ -20,12 +20,19 @@ const NavBar = ({chatSelected}) => {
     name=chatSelected.username?chatSelected.username:chatSelected.groupName
   }
 
-  const handleClick =()=>navigate('/videoCall',{
+  
+  const handleAudioClick =()=>navigate('/videoCall',{
     state:{
+      isVideo:false,
       remoteUser:chatSelected
     }
   })
-
+  const handleVideoClick =()=>navigate('/videoCall',{
+    state:{
+      isVideo:true,
+      remoteUser:chatSelected
+    }
+  })
   return (
     <div className='flex justify-between items-center z-10 '>
         
@@ -44,8 +51,9 @@ const NavBar = ({chatSelected}) => {
 
             <div className='flex justify-center gap-x-4 pr-6'>
             <FiSearch/>
-            <MdCall/>
-            <MdVideoCall className={`${(chatSelected && chatSelected.username && isOnline)?"cursor-pointer":"text-gray-400"}`} onClick={(chatSelected && chatSelected.username && isOnline)?handleClick:()=>{}} />
+            <MdCall className={`${(chatSelected && chatSelected.username && isOnline)?"cursor-pointer":"text-gray-400"}`} onClick={(chatSelected && chatSelected.username && isOnline)?handleAudioClick:()=>{}} />
+
+            <MdVideoCall className={`${(chatSelected && chatSelected.username && isOnline)?"cursor-pointer":"text-gray-400"}`} onClick={(chatSelected && chatSelected.username && isOnline)?handleVideoClick:()=>{}} />
             <HiOutlineDotsHorizontal/>
 
 

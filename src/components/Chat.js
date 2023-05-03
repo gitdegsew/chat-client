@@ -7,7 +7,7 @@ import {BiImageAlt} from 'react-icons/bi'
 import { appContext } from '../App'
 
 export const chatContext =createContext()
-const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelected,lastMessages,setmCount }) => {
+const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelected,lastMessages,setmCount,searchItem }) => {
   const user= sessionStorage.getItem('currentUser')
   const value= true
   const name=item.username?item.username:item.groupName
@@ -37,6 +37,15 @@ const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelec
   const mtd=date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes()
   const identify= date.getHours()<=12?"AM":"PM"
 
+
+  // const isSearched=()=>{
+  //   const chatName=item.username?item.username:item.groupName
+  //     if(chatName.includes(searchItem)) return true
+  //     return false
+
+      
+
+  // }
  
    
   useEffect(()=>{

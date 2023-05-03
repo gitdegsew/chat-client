@@ -27,6 +27,8 @@ const ChatPage = () => {
   const [fileshare,setFileshare] = useState({})
   const [timeoutId,setTimeoutId] = useState(null)
   const [updatedItem,setUpdatedItem]=useState(null)
+  const [percent,setPercent] = useState(0)
+  const [isVideoCall,setIsVideoCall] = useState(true)
   
 
   const  {
@@ -102,6 +104,7 @@ useEffect(()=>{
     const sender=sessionStorage.getItem('username')
     fileshare.buffer.push(buffer)
     console.log(fileshare.transferred *100/fileshare.metadata.max_buffer_size)
+    setPercent(fileshare.transferred *100/fileshare.metadata.max_buffer_size)
     fileshare.transferred +=buffer.byteLength
     // setFileupload(Math.round(100*fileshare.transferred/fileshare.metadata.max_buffer_size)  + "%")
     if (fileshare.transferred===fileshare.metadata.max_buffer_size){
@@ -223,6 +226,7 @@ if(chatSelected){
   clearTimeout(timeoutId)
   navigate('/videoCall',
  { state:{
+    isVideo:isVideoCall,
     remoteUser:caller
   }}
   )
@@ -238,13 +242,13 @@ if(chatSelected){
 
  }
 
-  const handleReceiveCall=({from,to})=>{
+  const handleReceiveCall=({from,to,isVideo})=>{
     console.log('call received ')
     
-      
+        setIsVideoCall(isVideo)
       setCaller(from)
       setIsBeingRequested(true)
-
+      setIsVideoCall(isVideo)
       
     const ti= setTimeout(()=>{
       
@@ -340,7 +344,8 @@ useEffect(()=>{
           updatedItem,
           setUpdatedItem,
           setGroups,
-          groups
+          groups,
+          percent
         }
     }>
         <div className='flex gap-x-2 justify-start  left-0 top-0 w-full fixed ' >
@@ -350,7 +355,7 @@ useEffect(()=>{
   !isLoading && error?<p>{error}</p>:
   (
     <>
-    {isBeingRequested&& caller&& <MyNotificaiton caller={caller} onAcceptRequest={onAcceptRequest} onRejectRequest={onRejectRequest}   />}
+    {isBeingRequested&& caller&& <MyNotificaiton caller={caller} isVideo={isVideoCall} onAcceptRequest={onAcceptRequest} onRejectRequest={onRejectRequest}   />}
     <ToastContainer />
     <SideBar tabSelected={tabSelected} setTabSelected={setTabSelected} /><Chats setGroups={setGroups} receivedMessage={receivedMessage} messageToSend= {messageToSend} users={users} groups={groups} tabSelected={tabSelected} setChatSelected={setChatSelected} setChats={setChats} chatSelected={chatSelected} /><CurrentChat setMessageToSend={setMessageToSend} chatSelected={chatSelected} chats={chats} setChats={setChats} /></>
   )

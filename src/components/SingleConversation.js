@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import src from '../assets/profile.jpg'
 import {AiFillFile} from "react-icons/ai"
+import { pageContext } from '../pages/ChatPage'
 
 const SingleConversation = ({chat,chatSelected,setChats}) => {
   
@@ -16,6 +17,8 @@ const SingleConversation = ({chat,chatSelected,setChats}) => {
   let toCheck = chat.users?chat.users[0]:chat.from
   const isUser= toCheck===user.id
   // const name=user.username
+
+  const {percent}=useContext(pageContext)
   
   let  name=(chat.isPrivate && !isUser)?chatSelected.username: isUser?user.username:chat.sender?chat.sender:'text'
   
@@ -35,7 +38,7 @@ const SingleConversation = ({chat,chatSelected,setChats}) => {
 }
 <div className={`'flex flex-col max-w-[350px] ${isUser?'bg-[#fbfaf9] rounded-md text-[#30302f]':'bg-[#6a78d1] rounded-md text-white'} p-2 justify-between gap-y-4'`}>
      {chat.messageType==='image'?<img className='w-[18vw] ' src={chat.message} />: chat.messageType==="non-text"?<p>
-      <AiFillFile/> {chat.message}
+      <AiFillFile/> {chat.message} {chat.from===user.id&& percent}
      </p>:chat.messageType==="image-blob"?<img className='w-[18vw]  ' src={chat.message} />:  <p>{chat.message}</p>}
     <p className='text-xs'>{`${htd}:${mtd} ${identify}` }</p>
     {/* `${htd}:${mtd} ${identify}` */}

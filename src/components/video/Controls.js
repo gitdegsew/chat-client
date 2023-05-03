@@ -8,28 +8,25 @@ import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 
 
-const Controls = ({isMicEnabled,isVidEnabled,toggleCamera,toggelMic,isAnswered,setIsAnswered,endCall}) => {
+const Controls = ({isMicEnabled,isVidEnabled,toggleCamera,toggelMic,isAnswered,setIsAnswered,endCall,isVideo}) => {
 
    const  {callAccepted}=useContext(SocketContext)
-    
-    
-    
-
+  
   return (
     <div className="flex justify-center items-center fixed bottom-5 z-20  ">
         <div className="flex justify-center items-center gap-8">
-          <div
+          {isVideo && <div
             className={`flex justify-center items-center w-12 h-12 cursor-pointer rounded-full ${
               isVidEnabled ? "bg-[#4484f1]" : "bg-[#cd3740]"
             }`}
             onClick={toggleCamera}
           >
             {isVidEnabled ? (
-              <IoMdVideocam id="vid" className="text-white w-8 h-8 " />
+               <IoMdVideocam id="vid" className="text-white w-8 h-8 " />
             ) : (
               <MdVideocamOff className="text-white w-8 h-8 " />
             )}
-          </div>
+          </div>}
           <div
             className={`flex justify-center items-center w-12 h-12 cursor-pointer rounded-full ${
               isMicEnabled ? "bg-[#4484f1]" : "bg-[#cd3740]"
