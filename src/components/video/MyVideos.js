@@ -57,6 +57,7 @@ const MyVideos = ({isVidEnabled,userToCall,isLoading}) => {
         ref={myVideo}
         className={`p-3 w-full h-72  bg-slate-800 ${isAnswered && "rounded-2xl z-40"}  `}
         hidden={!isVidEnabled}
+        muted
       />
 
       {!isVidEnabled && (

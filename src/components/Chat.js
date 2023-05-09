@@ -5,18 +5,22 @@ import {socket } from "../socket"
 import { pageContext } from '../pages/ChatPage'
 import {BiImageAlt} from 'react-icons/bi'
 import { appContext } from '../App'
+import {MdVideoLibrary} from "react-icons/md"
 
 export const chatContext =createContext()
 const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelected,lastMessages,setmCount,searchItem }) => {
-  const user= sessionStorage.getItem('currentUser')
+  const user= JSON.parse(sessionStorage.getItem('currentUser'))
   const value= true
   const name=item.username?item.username:item.groupName
   const currentUser=JSON.parse(sessionStorage.getItem('currentUser'))
   const [isLoading,setIsLoading] = useState(true)
   const [messages,setMessages] =useState([])
   const [error,setError] = useState(null)
+  const [notCount,setNotCount] = useState(0)
 
-  const {onlineUsers}=useContext(appContext)
+
+  const {onlineUsers,unseen,setUnseen}=useContext(appContext)
+
   // console.log('from chat')
   // console.log(onlineUsers)
  
@@ -26,8 +30,30 @@ const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelec
   const {
     receivedMessage,
     updatedItem,
-    setUpdatedItem
+    setUpdatedItem,
+    groups
   }=useContext(pageContext)
+
+  
+  useEffect(()=>{
+      let count=0
+      unseen.forEach(v=> {
+        if(v.check===item._id){
+            count+=1
+          
+        }
+      })
+      setNotCount(count)
+
+      
+  },[unseen])
+
+  const handleNot=()=>{
+    setNotCount(0)
+    const newUnseen =unseen.filter(msg =>msg.check!==item._id)
+
+    setUnseen(newUnseen)
+  }
 
   
   const chat=messages.length>0 && messages[messages.length-1]
@@ -101,7 +127,7 @@ const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelec
  
   useEffect(() =>{
 
-    console.log('one form each chat')
+    // console.log('one form each chat')
 
     getMessages(currentUser.accessToken,currentUser.id,item._id,priv).then((result)=>{
       setMessages(result)
@@ -122,7 +148,23 @@ const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelec
 
 
 // yared
+ const handleNewChat =()=>{
 
+  getMessages(currentUser.accessToken,currentUser.id,item._id,priv).then((result)=>{
+    setMessages(result)
+    setChats(messages)
+    setChatSelected(item)
+    handleNot()
+    
+    setIsLoading(false)
+
+  }).catch((error)=>{
+    setError(error.messagees)
+    setIsLoading(false)
+
+  })
+
+ }
   
 
 
@@ -134,15 +176,26 @@ const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelec
       socket.off('msg-receive',listner)
     }
   },[chatSelected])
+  let isItU
+ if(messages && messages[messages.length-1] ){
 
-
+   isItU= messages[messages.length-1].sender==="ADMIN" && messages[messages.length-1].message.split(' ')[0]===user.username
+ 
+ }
+ 
 
 
   return (
     <div className={`${(tabSelected=="Users" && !item.username)|| (tabSelected=="Groups" &&!item.groupName)?"hidden":"flex"} justify-between items-end rounded-lg   hover:cursor-pointer hover:bg-[#d7d4d9]` } onClick={()=>{
-      setChatSelected(item)
-      count.current=0
-      setChats(messages)
+      
+      if(!groups.map(group=>group._id).includes(item._id)){
+        handleNewChat()
+      }else{
+        setChatSelected(item)
+        handleNot()
+        setChats(messages)
+        }
+      
     }
     } >
           <div className="flex items-center gap-x-4">
@@ -156,21 +209,27 @@ const Chat = ({item,setChatSelected,chatSelected,setChats,messageToSend,tabSelec
               isLoading && !error?<p className='text-xs'>message loading...</p>:
               !isLoading && error ?<p>error</p>:
               !isLoading && !error && messages && messages.length===0?<p className='text-[#bacda0]'>no chats yet</p>:
-              <p className='text-[#465433]'>{(messages[messages.length-1].messageType==="image" ||messages[messages.length-1].messageType==="image-blob")?<span className='flex gap-2 justify-center items-center'><BiImageAlt/> image</span>:messages[messages.length-1].message.length>20?`${messages[messages.length-1].message.slice(0,20)}...`:messages[messages.length-1].message}</p>
+              <p className='text-[#465433]'>{(messages[messages.length-1].messageType==="image" ||messages[messages.length-1].messageType==="image-blob")?<span className='flex gap-2 justify-center items-center'><BiImageAlt/> image</span>:(messages[messages.length-1].messageType==="video" ||messages[messages.length-1].messageType==="video-db")?<span className='flex gap-2 justify-center items-center'><MdVideoLibrary/> video</span>:
+              isItU? `You  ${messages[messages.length-1].message.split(' ')[2]} the group` :
+              messages[messages.length-1].message.length>20?`${messages[messages.length-1].message.slice(0,20)}...`:
+              
+              messages[messages.length-1].message}</p>
             }
             
           </div>
           </div >
             <div>
             <p className="text-xs">{messages.length>0 && `${htd}:${mtd} ${identify}` }</p>
-            {/* {
-              count.current>0?<p className="h-5 w-5 rounded-full bg-blue-600 flex justify-center items-center" >
-              {count.current}
-            </p>:null
-            } */}
+            {
+              notCount>0&&<p className="h-5 w-5 rounded-full bg-[#2998a6] text-[#eef2f3] text-xs flex justify-center items-center" >
+              {notCount}
+            </p>
+            }
             </div>
         </div>
   )
 }
 
 export default Chat
+
+// {chat.sender==="ADMIN" && chat.message.split(' ')[0]===user.username? `You  ${chat.message.split(' ')[2]} the group` :chat.message}

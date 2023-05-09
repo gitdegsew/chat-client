@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import { postGroup } from '../utils/api'
 import LoadingIcons from 'react-loading-icons'
 import { appContext } from '../App'
+import { socket } from "../socket";
+import { pageContext } from '../pages/ChatPage';
 
 const CreateGroup = ({setIsHiddden,groups,setGroups}) => {
     const [groupName,setGroupName] =useState('')
@@ -15,6 +17,8 @@ const CreateGroup = ({setIsHiddden,groups,setGroups}) => {
     //   setGroups,
       
     // }=useContext(appContext)
+
+    const {setChats,chats,setMessageToSend,setChatSelected} =useContext(pageContext)
 
     useEffect(()=>{
         const lis=() =>{
@@ -53,21 +57,48 @@ const CreateGroup = ({setIsHiddden,groups,setGroups}) => {
           }
     }
 
-    const handelCreateGroup=async()=>{
-      try {
+    const handelCreateGroup=()=>{
+        console.log('handleCreateGroup is called')
+
+        // socket.emit('groupCreated',{})
+
         setIsLoading(true)
-        const result= await postGroup(user.accessToken,groupName,user.id)
-        setIsLoading(false)
-        setGroup(result)
-        setIsHiddden(true)
-        setGroups([...groups,result])
-        socket.emit('groupCreated',groupName)
+         postGroup(user.accessToken,groupName,user.id).then((result) =>{
+
+          setIsLoading(false)
+          setGroup(result)
+          setIsHiddden(true)
+          setGroups([...groups,result])
+          const messageToSend = {
+            message: `${user.username} has created the group`,
+            from: user.id,
+      
+            to: result._id,
+            messageType: "notification",
+            isPrivate:  false,
+            sender: "ADMIN",
+            createdAt: new Date(),
+          };
+          
+          setChatSelected(result)
+          setChats([...chats,messageToSend])
+          setMessageToSend(messageToSend)
+
+          console.log("creating group has reached here...")
+  
+          socket.emit('groupCreated',{groupName,groupId:result._id,userId:user.id,username:user.username})
+
+         }).catch(error =>{
+          console.log("creating must be here...")
+          console.log(error)
+          setIsLoading(false)
+          setError(error)
+         })
+
+       
         
         
-      } catch (error) {
-        setIsLoading(false)
-        setError(error)
-      }
+      
 
 
     }

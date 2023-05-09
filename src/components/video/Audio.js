@@ -48,6 +48,7 @@ const Audio = ({ userToCall, isLoading }) => {
         ref={myVideo}
         className={`w-full  h-72 p-8 bg-black`}
         hidden
+        muted
       />
 
       <div className="p-8 flex flex-col justify-center w-full  mt-[-60]  bg-slate-800 text-white  items-center">
@@ -71,6 +72,7 @@ const Audio = ({ userToCall, isLoading }) => {
         ref={userVideo}
         className={`w-full  h-72 p-8 bg-black`}
         hidden
+        
       />
 
       <div className="p-8 flex flex-col justify-center w-full  mt-[-60]  bg-slate-800 text-white  items-center">

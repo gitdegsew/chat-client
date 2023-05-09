@@ -7,6 +7,8 @@ import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 import CreateGroup from "./CreateGroup";
 
+import { getGroups } from "../utils/api";
+
 const Chats = ({
   users,
   groups,
@@ -27,9 +29,14 @@ const Chats = ({
   const [isSearching,setIsSearching] = useState(false)
   const [searchedItems,setSearchedItems] = useState([])
   const [searchItem, setSearchItem] = useState("");
+  const [fechedGroups,setFechedGroups] = useState([])
+  const [searchList, setSearchList] = useState([])
+  const [myChats, setMyChats] = useState([])
+  const [globalSearchList, setGlobalSearchList] = useState([])
+  const [inGroupSearch, setInGroupSearch] = useState(false)
 
 
-
+  const user = JSON.parse(sessionStorage.getItem("currentUser"));
   const lastMessages = React.useRef(new Map());
   const newChats = React.useRef([]);
 
@@ -48,8 +55,8 @@ const Chats = ({
 
 
 
-  const handleUpdate =()=>{
-    if (mcount >= allChats.length) {
+  const handleUpdate =(flag)=>{
+    if (mcount >= allChats.length || flag) {
       
       const nm = new Map([...lastMessages.current].filter((e) => e[1]));
       // console.log(nm)
@@ -101,7 +108,7 @@ const Chats = ({
     }
   }
 
-  handleUpdate()
+  handleUpdate(false)
 
 
 
@@ -116,6 +123,7 @@ const Chats = ({
       const item = newChats.current.find((item) => toCheck === item._id);
       
       newChats.current = newChats.current.filter(
+        
         (chat) => chat._id !== item._id
       );
         if(item){
@@ -133,14 +141,23 @@ const Chats = ({
     
 
     if (messageToSend) {
-      const item = newChats.current.find(
+      let item = newChats.current.find(
         (item) => messageToSend.to === item._id
       );
 
-      newChats.current = newChats.current.filter(
-        (chat) => chat._id !== item._id
-      );
-      lastMessages.current.set(item._id, messageToSend);
+      if(item){
+        newChats.current = newChats.current.filter(
+          (chat) => chat._id !== item._id
+        );
+        lastMessages.current.set(item._id, messageToSend);
+      }else{
+       
+        lastMessages.current.set(messageToSend.to, messageToSend);
+        // handleUpdate(true)
+      }
+
+      
+      
     }
   }, [messageToSend]);
 
@@ -166,8 +183,21 @@ const handleOnFocus=()=>{
   }
     
   )
+  setMyChats(chatsWithMessage)
   setSearchedItems(chatsWithMessage)
+  
+  
+  setSearchList(chatsWithMessage)
+  getGroups(user.accessToken).then((groups) =>{
+    setFechedGroups(groups)
+    setGlobalSearchList(groups)
+  })
+  
+
+
  }
+
+
 }
 
 const handleSearch= (e)=>{
@@ -184,13 +214,30 @@ const handleSearch= (e)=>{
     console.log(searchedItems)
 
     
-    const filteredItems =newChats.current.filter(item=>{
+   
+    const filteredItems =searchList.filter(item=>{
       const chatName=item.username?item.username:item.groupName
       if(chatName.includes(e.target.value)) return true
       return false
     })
-
     setSearchedItems(filteredItems)
+
+    if(filteredItems.length==0){
+      setInGroupSearch(true)
+      const filteredFetch=fechedGroups.filter(item=>{
+        if(item.groupName.includes(e.target.value)) return true
+        return false
+      }
+        
+       
+      )
+      setSearchedItems([...filteredFetch])
+
+    }else{
+      setInGroupSearch(false)
+      setSearchedItems(filteredItems)
+     
+    }
     setIsUpdated({...isUpdated})
     console.log("filetered items")
     console.log(filteredItems)

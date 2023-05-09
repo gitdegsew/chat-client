@@ -109,16 +109,7 @@ const VideoPlayer = () => {
     // setIsAnswered(false)
   };
 
-  const handleEndCall = () => {
-    // setCallAccepted(false)
-    setIsCalling(false);
-    setIsAnswered(false);
-    setIsBeingCalled(false);
-    notify("call ended");
-    // stopBothVideoAndAudio(rs.current)
-
-    // setIsAnswered(true)
-  };
+  
 
   const handleReceiveCall = ({ from, to, isVideo }) => {
     console.log("call received from vp ");
@@ -198,13 +189,50 @@ const VideoPlayer = () => {
       from: user.id,
       to: remoteUser.id ? remoteUser.id : remoteUser._id,
     });
+
+
+    // stopBothVideoAndAudio(rs.current)
     // peerConnection.current.close()
+
     // peerConnection.current=null
+    // navigate("/videoCall", {
+    //   state: {
+    //     isVideo: isVideoCall,
+    //     remoteUser: caller,
+    //   },
+    // })
+
+    // navigate("/chat")
+    
+    
     // console.log('peerConnection ',peerConnection.current)
     // console.log('remoteStream before ',rs.current)
     // stopBothVideoAndAudio(rs.current)
     // console.log('remoteStream after ',rs.current)
+    navigate('/chat')
   };
+
+  const handleEndCall = () => {
+    // setCallAccepted(false)
+    setIsCalling(false);
+    setIsAnswered(false);
+    setIsBeingCalled(false);
+    notify("call ended");
+    // stopBothVideoAndAudio(rs.current)
+
+    // setIsAnswered(true)
+
+    // navigate("/videoCall", {
+    //   state: {
+    //     isVideo: isVideoCall,
+    //     remoteUser: caller,
+    //   },
+    // })
+
+    navigate('/chat')
+  };
+
+
 
   const startCall = () => {
     socket.emit("start-call", { from: user, to: userToCall, isVideo });
