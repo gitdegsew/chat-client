@@ -35,4 +35,4 @@ function stopAudioOnly(stream) {
     });
 }
 
-module.exports ={stopAudioOnly,stopVideoOnly,stopBothVideoAndAudio,removeTracksFunction}
+module.exports ={stopAudioOnly,stopVideoOnly,stopBothVideoAndAudio,stopBothVideoAndAudio,removeTracksFunction}
