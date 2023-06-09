@@ -259,6 +259,8 @@ const VideoPlayer = () => {
     }
   };
   const toggelMic = () => {
+    console.log("toggle-mic");
+    console.log(myVideo.srcObject);
     if (localStream) {
       let audioTrack = localStream
         .getTracks()

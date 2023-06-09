@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = "http://192.168.0.163:3001"
+const baseUrl = "https://chat-api-1kxv.onrender.com"
 // const baseUrl = "http://localhost:3001";
 
 const getUsers = async (token, id) => {
