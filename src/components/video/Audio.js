@@ -3,7 +3,7 @@ import { SocketContext } from "./context";
 import { appContext } from "../../App";
 import ReactLoading from "react-loading";
 import LoadingIcons from "react-loading-icons";
-import Siriwave from "react-siriwave"
+
 
 const Audio = ({ userToCall, isLoading }) => {
   const user = JSON.parse(sessionStorage.getItem("currentUser"));
