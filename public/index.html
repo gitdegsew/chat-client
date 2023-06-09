@@ -25,6 +25,21 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <script>
+      {
+        var WS = window.WebSocket;
+        function DevWebSocket(s) {
+          if (true) {
+            console.info("[DEV NOTICE] Live Reload Has Been Disabled");
+            return {};
+          } else {
+            // Pass through other usage of sockets
+            return new WS(s);
+          }
+        }
+        window.WebSocket = DevWebSocket;
+      }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -39,5 +54,7 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+
+    
   </body>
 </html>

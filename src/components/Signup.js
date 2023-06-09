@@ -3,7 +3,7 @@ import { loginFields, signupFields } from "../constants/formFields"
 import FormAction from "./FormAction";
 import Input from "./Input";
 import axios from "axios";
-
+import { baseUrl } from '../utils/api';
 import { useNavigate } from 'react-router';
 
 const fields=loginFields;
@@ -31,7 +31,7 @@ export default function Signup(){
     try {
       console.log('before sending')
       console.log(signupState.username,signupState.password)
-      const response = await axios.post('http://localhost:3001/register',{
+      const response = await axios.post(`${baseUrl}/register`,{
         username:signupState.username,
         password:signupState.password
       })

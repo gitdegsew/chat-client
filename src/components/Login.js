@@ -4,7 +4,7 @@ import FormAction from "./FormAction";
 import FormExtra from "./FormExtra";
 import Input from "./Input";
 import axios from 'axios'
-
+import { baseUrl } from '../utils/api';
 import { useNavigate } from 'react-router';
 
 
@@ -30,7 +30,7 @@ export default function Login(){
     const authenticateUser = async() =>{
         try {
             
-            const response = await axios.post('http://localhost:3001/login',{
+            const response = await axios.post(`${baseUrl}/login`,{
               username:loginState.username,
               password:loginState.password
             })

@@ -1,6 +1,8 @@
 import {io} from "socket.io-client"
-const URL="http://localhost:3001"
+import { baseUrl } from "./utils/api";
+// const URL="http://192.168.0.163:3001"
 
-export const socket = io(URL, {
-    autoConnect: false
+export const socket = io(baseUrl, {
+    autoConnect: false,
+    
   });
