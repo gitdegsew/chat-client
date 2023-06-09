@@ -7,7 +7,7 @@ import ReactPlayer from "react-player";
 import { useLocation } from "react-router";
 import { appContext } from "../../App";
 import { useBeforeUnload } from "react-router-dom";
-import { stopBothVideoAndAudio } from "../../utils/stream";
+
 
 
 const SocketContext = createContext();
@@ -75,7 +75,7 @@ const ContextProvider = () => {
   // useBeforeUnload(
   //   ()=>{
   //     if(localStream){
-  //       stopBothVideoAndAudio(localStream)
+  //       
   //     }
   //   }
    
@@ -142,14 +142,8 @@ const ContextProvider = () => {
     return () => {
       console.log("context cleared context cleared",rls.current)
       // peerConnection.current.close()
-      if(rls.current){
-        stopBothVideoAndAudio(rls.current)
-        
-      }
-      if(rs.current){
-        stopBothVideoAndAudio(rs.current)
-        
-      }
+     
+      
       socket.removeAllListeners("user-logdedIn");
       socket.removeAllListeners("receive-offer");
       socket.removeAllListeners("receive-answer");

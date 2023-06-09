@@ -1,10 +1,4 @@
-function stopBothVideoAndAudio(stream) {
-    stream.getTracks().forEach(function(track) {
-        if (track.readyState == 'live') {
-            track.stop();
-        }
-    });
-}
+
 
 async function removeTracksFunction(newStream) {
     let videoTrack = newStream.getVideoTracks()[0];
@@ -35,4 +29,4 @@ function stopAudioOnly(stream) {
     });
 }
 
-module.exports ={stopAudioOnly,stopVideoOnly,stopBothVideoAndAudio,stopBothVideoAndAudio,removeTracksFunction}
+module.exports ={stopAudioOnly,stopVideoOnly,removeTracksFunction}

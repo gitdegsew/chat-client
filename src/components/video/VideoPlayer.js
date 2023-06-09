@@ -13,7 +13,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaLastfmSquare } from "react-icons/fa";
 import MyNotificaiton from "./notification";
-import { stopBothVideoAndAudio } from "../../utils/stream";
+
 import Controls from "./Controls";
 import Audio from "./Audio";
 import MyVideos from "./MyVideos";
@@ -167,9 +167,7 @@ const VideoPlayer = () => {
 
     return () => {
       console.log("video player cleared");
-      if (localStream) {
-        stopBothVideoAndAudio(localStream);
-      }
+     
       socket.removeAllListeners("accept-request");
       socket.removeAllListeners("reject-request");
       socket.removeAllListeners("reject-call");
@@ -191,7 +189,7 @@ const VideoPlayer = () => {
     });
 
 
-    // stopBothVideoAndAudio(rs.current)
+   
     // peerConnection.current.close()
 
     // peerConnection.current=null
@@ -207,7 +205,7 @@ const VideoPlayer = () => {
     
     // console.log('peerConnection ',peerConnection.current)
     // console.log('remoteStream before ',rs.current)
-    // stopBothVideoAndAudio(rs.current)
+    
     // console.log('remoteStream after ',rs.current)
     navigate('/chat')
   };
@@ -218,7 +216,7 @@ const VideoPlayer = () => {
     setIsAnswered(false);
     setIsBeingCalled(false);
     notify("call ended");
-    // stopBothVideoAndAudio(rs.current)
+   
 
     // setIsAnswered(true)
 
