@@ -45,12 +45,9 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
   };
 
   const shareFile = (metadata, buffer) => {
-    // console.log("selected id",chatSelected._id)
     socket.emit("file-meta", metadata);
 
     socket.on("fs-start", ({ from, to, isPrivate, percentage }) => {
-      // console.log('file start received from text field')
-
       let chunk = buffer.slice(0, metadata.buffer_size);
       buffer = buffer.slice(metadata.buffer_size, buffer.length);
       if (chunk.length !== 0) {
@@ -117,7 +114,6 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
 
         const formdata = new FormData();
         formdata.append("imageMessage", files, files.name);
-        // console.log('checking file '+Array.from(files))
         formdata.append("message", files.name);
         formdata.append("from", user.id);
         formdata.append("sender", user.username);
@@ -129,7 +125,6 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
         console.log("from text field", formdata);
         const token = user.accessToken;
 
-        // console.log('postImage from api ',formdata)
         fetch(`${baseUrl}/messages/image`, {
           method: "POST",
 
@@ -162,7 +157,6 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
 
         const formdata = new FormData();
         formdata.append("imageMessage", files, files.name);
-        // console.log('checking file '+Array.from(files))
         formdata.append("message", files.name);
         formdata.append("from", user.id);
         formdata.append("sender", user.username);
@@ -174,7 +168,6 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
         console.log("from text field", formdata);
         const token = user.accessToken;
 
-        // console.log('postImage from api ',formdata)
         fetch(`${baseUrl}/messages/image`, {
           method: "POST",
 
