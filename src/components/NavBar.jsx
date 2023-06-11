@@ -11,19 +11,15 @@ import MyDropButton from "./MyDropButton";
 import { pageContext } from "../pages/ChatPage";
 import { leaveGroup } from "../utils/api";
 
-
 const NavBar = ({ chatSelected }) => {
   const [localIsTyping, setLocalIsTyping] = useState(false);
-  const [leaveLoading, setLeaveLoading] = useState(false)
+  const [leaveLoading, setLeaveLoading] = useState(false);
   const user = JSON.parse(sessionStorage.getItem("currentUser"));
   const navigate = useNavigate();
 
-  const { onlineUsers,isTyping,beingTyped,typing } = useContext(appContext);
-  // console.log('from chat')
-  // console.log(onlineUsers)
+  const { onlineUsers, isTyping, beingTyped, typing } = useContext(appContext);
 
-  const {groups,setGroups,setChatSelected} =useContext(pageContext)
-  
+  const { groups, setGroups, setChatSelected } = useContext(pageContext);
 
   let isOnline;
   let name;
@@ -34,20 +30,13 @@ const NavBar = ({ chatSelected }) => {
       : chatSelected.groupName;
   }
 
-
-  
-
   useEffect(() => {
-
-    if(isTyping && chatSelected && beingTyped.includes(chatSelected._id)){
-      setLocalIsTyping(true)
-    }else{
-      setLocalIsTyping(false)
+    if (isTyping && chatSelected && beingTyped.includes(chatSelected._id)) {
+      setLocalIsTyping(true);
+    } else {
+      setLocalIsTyping(false);
     }
-
-    
-   
-  }, [beingTyped,chatSelected]);
+  }, [beingTyped, chatSelected]);
 
   const handleAudioClick = () =>
     navigate("/videoCall", {
@@ -64,30 +53,25 @@ const NavBar = ({ chatSelected }) => {
       },
     });
 
-
-    const handleLeaveGroup =() =>{
-      setLeaveLoading(true)
-      leaveGroup(user.accessToken,user.id,chatSelected._id).then((returnedGroup) =>{
-          setLeaveLoading(false)
-          const filteredGroups = groups.filter(group => group._id !==returnedGroup._id)
-          setGroups(filteredGroups)
-          setChatSelected(null)
-          socket.emit('leave-group', {groupId:returnedGroup._id,userId:user.id,username:user.username,groupName:returnedGroup.groupName})
-
-          // const newUnseen =unseen.filter(msg =>msg.check!==item._id)
-
-          // setUnseen(newUnseen)
-      })
-
-      
-      
-     
-    }
-
-
-
-
-
+  const handleLeaveGroup = () => {
+    setLeaveLoading(true);
+    leaveGroup(user.accessToken, user.id, chatSelected._id).then(
+      (returnedGroup) => {
+        setLeaveLoading(false);
+        const filteredGroups = groups.filter(
+          (group) => group._id !== returnedGroup._id
+        );
+        setGroups(filteredGroups);
+        setChatSelected(null);
+        socket.emit("leave-group", {
+          groupId: returnedGroup._id,
+          userId: user.id,
+          username: user.username,
+          groupName: returnedGroup.groupName,
+        });
+      }
+    );
+  };
 
   return (
     <div className="flex justify-between items-center z-10">
@@ -103,21 +87,25 @@ const NavBar = ({ chatSelected }) => {
                 ? chatSelected.username
                 : chatSelected.groupName}
             </h3>
-            {localIsTyping  &&  chatSelected.username  && (
-
+            {localIsTyping && chatSelected.username && (
               <h2 className="text-[#0b8d76] text-xs">
-                 (typing<Dot>.</Dot>
+                (typing<Dot>.</Dot>
                 <Dot>.</Dot>
                 <Dot>.</Dot>)
               </h2>
             )}
-            {localIsTyping  &&  chatSelected.groupName &&  typing.get(chatSelected._id).map((item,index)=>(
-              <div key={index} ><h2 className="text-[#0d0d0d] text-xs">{item}</h2><h2 className="text-[#0b8d76] text-xs">
-                typing<Dot>.</Dot>
-                <Dot>.</Dot>
-                <Dot>.</Dot>
-              </h2></div>
-)) }
+            {localIsTyping &&
+              chatSelected.groupName &&
+              typing.get(chatSelected._id).map((item, index) => (
+                <div key={index}>
+                  <h2 className="text-[#0d0d0d] text-xs">{item}</h2>
+                  <h2 className="text-[#0b8d76] text-xs">
+                    typing<Dot>.</Dot>
+                    <Dot>.</Dot>
+                    <Dot>.</Dot>
+                  </h2>
+                </div>
+              ))}
           </>
         ) : (
           <p>No chat selected</p>
@@ -151,11 +139,10 @@ const NavBar = ({ chatSelected }) => {
               : () => {}
           }
         />
-        {chatSelected && groups.map(group=>group._id).includes(chatSelected._id) && <MyDropButton handleLeaveGroup={handleLeaveGroup} />}
-        {/* <HiOutlineDotsHorizontal /> */}
-        {/* <div className="relative">
-        
-        </div> */}
+        {chatSelected &&
+          groups.map((group) => group._id).includes(chatSelected._id) && (
+            <MyDropButton handleLeaveGroup={handleLeaveGroup} />
+          )}
       </div>
     </div>
   );
