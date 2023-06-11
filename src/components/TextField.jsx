@@ -9,16 +9,6 @@ import data from "@emoji-mart/data";
 import { baseUrl } from "../utils/api";
 import { appContext } from "../App";
 
-
-// if(files.type.includes("video")!==false) {
-//   const blobdata=URL.createObjectURL(files)        
-//   setAllMessages((list)=>[...list, {author,message:blobdata,reciever, messagetype:"video",createdAt}])         
- 
-//   postVideo(files,author,reciever)
- 
-
-//  }
-
 const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
   const user = JSON.parse(sessionStorage.getItem("currentUser"));
   const [text, setText] = useState("");
@@ -28,65 +18,56 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
     setOpen((prev) => !prev);
   };
 
-  const {
-    setPercentage,
-    percentageT
-    
-  }=useContext(appContext)
+  const { setPercentage, percentageT } = useContext(appContext);
 
-  
- 
-
-  const typingText = (e)=>{
-    let random= e.target.value
-    if((random.trim()).length ===0){
-        socket.emit("finished",{from:{id:user.id,username:user.username}, to:chatSelected._id,isPrivate: chatSelected.username ? true : false,})
-        // console.log("empty")
+  const typingText = (e) => {
+    let random = e.target.value;
+    if (random.trim().length === 0) {
+      socket.emit("finished", {
+        from: { id: user.id, username: user.username },
+        to: chatSelected._id,
+        isPrivate: chatSelected.username ? true : false,
+      });
+    } else if (random.trim().length === 1) {
+      socket.emit("istyping", {
+        from: { id: user.id, username: user.username },
+        to: chatSelected._id,
+        isPrivate: chatSelected.username ? true : false,
+      });
     }
-    else if((random.trim()).length ===1){
-    socket.emit("istyping", {from:{id:user.id,username:user.username}, to:chatSelected._id,isPrivate: chatSelected.username ? true : false,})
-}
-}
+  };
 
   const selectedEmoji = (e) => {
     let elm = document.getElementById("message");
-    
+
     elm.value = elm.value + e.native;
     setText(elm.value);
-    
   };
-
-
-
 
   const shareFile = (metadata, buffer) => {
     // console.log("selected id",chatSelected._id)
     socket.emit("file-meta", metadata);
 
-    socket.on("fs-start", ({ from, to, isPrivate,percentage }) => {
+    socket.on("fs-start", ({ from, to, isPrivate, percentage }) => {
       // console.log('file start received from text field')
-      
+
       let chunk = buffer.slice(0, metadata.buffer_size);
       buffer = buffer.slice(metadata.buffer_size, buffer.length);
       if (chunk.length !== 0) {
-        console.log("ok",percentage);
-        if(percentageT<percentage){
-          setPercentage(percentage)
+        console.log("ok", percentage);
+        if (percentageT < percentage) {
+          setPercentage(percentage);
         }
 
         socket.emit("file-raw", {
           buffer: chunk,
           from: to,
           to: metadata.to,
-          isPrivate:metadata.isPrivate,
+          isPrivate: metadata.isPrivate,
         });
       }
     });
   };
-
-
-
-
 
   const sendFile = async (e) => {
     const files = e.target.files[0];
@@ -96,7 +77,10 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
     const message = files.name;
     e.target.value = null;
 
-    if (files.type.includes("image") === false && files.type.includes("video")===false) {
+    if (
+      files.type.includes("image") === false &&
+      files.type.includes("video") === false
+    ) {
       const messageToSend = {
         from: user.id,
         to: chatSelected._id,
@@ -161,7 +145,6 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
             data === 201 ? console.log("success") : console.log("failure");
           });
       }
-
 
       if (files.type.includes("video") !== false) {
         const blobdata = URL.createObjectURL(files);
@@ -234,7 +217,11 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
 
   const handleSend = async () => {
     console.log("handle send is called");
-    socket.emit("finished",{from:{id:user.id,username:user.username}, to:chatSelected._id,isPrivate: chatSelected.username ? true : false,})
+    socket.emit("finished", {
+      from: { id: user.id, username: user.username },
+      to: chatSelected._id,
+      isPrivate: chatSelected.username ? true : false,
+    });
 
     const messageToSend = {
       message: text,
@@ -267,12 +254,13 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
           value={text}
           id="message"
           onChange={(e) => {
-            typingText(e)
-            setText(e.target.value)}}
+            typingText(e);
+            setText(e.target.value);
+          }}
           placeholder="Type text here..."
-          onKeyDown={(e)=>{e.key==='Enter'&& 
-                handleSend()
-                }}
+          onKeyDown={(e) => {
+            e.key === "Enter" && handleSend();
+          }}
         />
         <BsEmojiSmile
           onClick={() => {
@@ -291,7 +279,6 @@ const TextField = ({ chatSelected, setChats, chats, setMessageToSend }) => {
         } items-center rounded-sm bg-[#416269] w-20`}
         disabled={!text}
         onClick={handleSend}
-
       >
         <MdSend className={`text-white w-8 h-8   `} />
       </button>
