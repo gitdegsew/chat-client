@@ -6,6 +6,7 @@ import axios from "axios";
 import { baseUrl } from "../utils/api";
 import { useNavigate } from "react-router";
 
+
 const fields = loginFields;
 let fieldsState = {};
 
@@ -13,6 +14,7 @@ fields.forEach((field) => (fieldsState[field.id] = ""));
 
 export default function Signup() {
   const user = JSON.parse(sessionStorage.getItem("currentUser"));
+  const [loading,setLoading] =useState(false)
 
   const navigate = useNavigate();
   const [signupState, setSignupState] = useState(fieldsState);
@@ -30,15 +32,18 @@ export default function Signup() {
     try {
       console.log("before sending");
       console.log(signupState.username, signupState.password);
+      setLoading(true)
       const response = await axios.post(`${baseUrl}/register`, {
         username: signupState.username,
         password: signupState.password,
       });
 
+      setLoading(false)
       sessionStorage.setItem("currentUser", JSON.stringify(response.data));
 
       navigate("/chat");
     } catch (error) {
+      setLoading(false)
       console.log(error);
     }
   };
@@ -60,7 +65,7 @@ export default function Signup() {
             placeholder={field.placeholder}
           />
         ))}
-        <FormAction handleSubmit={handleSubmit} text="Signup" />
+        <FormAction handleSubmit={handleSubmit} text="Signup" loading={loading} />
       </div>
     </form>
   );

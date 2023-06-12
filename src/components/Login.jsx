@@ -13,6 +13,7 @@ fields.forEach((field) => (fieldsState[field.id] = ""));
 
 export default function Login() {
   const [loginState, setLoginState] = useState(fieldsState);
+  const [loading,setLoading] = useState(false)
 
   const navigate = useNavigate();
 
@@ -27,15 +28,18 @@ export default function Login() {
 
   const authenticateUser = async () => {
     try {
+      setLoading(true)
       const response = await axios.post(`${baseUrl}/login`, {
         username: loginState.username,
         password: loginState.password,
       });
 
+      setLoading(false)
       sessionStorage.setItem("currentUser", JSON.stringify(response.data));
 
       navigate("/chat");
     } catch (error) {
+      setLoading(false)
       console.log(error);
     }
   };
@@ -60,7 +64,7 @@ export default function Login() {
       </div>
 
       <FormExtra />
-      <FormAction handleSubmit={handleSubmit} text="Login" />
+      <FormAction handleSubmit={handleSubmit} text="Login" loading={loading} />
     </form>
   );
 }
