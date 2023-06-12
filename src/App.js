@@ -108,7 +108,7 @@ function App() {
         typing,
       }}
     >
-      <div className="min-h-full bg-purple-300 h-screen flex items-center justify-center">
+      <div className="min-h-full  h-screen flex items-center justify-center">
         <div className=" w-full bg-white p-8 md:w-4/5 lg:w-3/5 lg:py-20 mx-10 md:p-8  space-y-8 flex justify-center items-center text-center rounded-lg">
           <BrowserRouter>
             <Routes>
