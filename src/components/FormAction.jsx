@@ -27,7 +27,7 @@ export default function FormAction({
        
         loading={loading}
         
-        size={50}
+        size={30}
         aria-label="Loading Spinner"
         data-testid="loader"
       />
